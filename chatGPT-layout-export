@@ -1,0 +1,30 @@
+import arcpy
+
+# Ścieżka do twojego projektu ArcGIS
+projekt = "ścieżka_do_twojego_projektu_arcgis.aprx"
+
+# Lista warstw, które chcesz eksportować
+warstwy = ["nazwa_warstwy1", "nazwa_warstwy2", "nazwa_warstwy3"]
+
+# Utwórz nowy projekt ArcGIS
+proj = arcpy.mp.ArcGISProject(projekt)
+
+# Utwórz nowy layout
+layout = proj.listLayouts()[0]  # Możesz zmodyfikować indeks, aby wybrać inny layout
+
+# Loop przez wszystkie warstwy
+for warstwa in warstwy:
+    # Ustawienia zasięgu mapy
+    mapa = layout.listElements('MAPFRAME_ELEMENT')[0]
+    mapa.camera.setExtent(warstwa.getExtent())
+
+    # Ustawienia nazwy eksportowanego pliku
+    nazwa_pliku = f"mapa_{warstwa}.pdf"
+
+    # Eksport do PDF
+    arcpy.mp.ExportToPDF(projekt, nazwa_pliku, resolution=300, layout=layout)
+
+# Zapisz zmiany w projekcie
+proj.save()
+
+print("Proces zakończony.")
