@@ -1,0 +1,36 @@
+import arcpy
+
+# Ścieżka do twojego projektu ArcGIS
+projekt = "ścieżka_do_twojego_projektu_arcgis.aprx"
+
+# Utwórz nowy projekt ArcGIS
+proj = arcpy.mp.ArcGISProject(projekt)
+
+# Wybierz layout
+layout = proj.listLayouts()[0]  # Możesz zmienić indeks, aby wybrać inny layout
+
+# Utwórz nową warstwę do maskowania
+maska_warstwa = arcpy.CreateFeatureclass_management("ścieżka_do_miejsca_zapisu.gdb", "maska_warstwa", "POLYGON")
+
+# Dodaj geometrię do warstwy maskującej (na przykład prostokąt, który zakryje obszar pod etykietą)
+cursor = arcpy.da.InsertCursor(maska_warstwa, ["SHAPE@"])
+array = arcpy.Array([arcpy.Point(0, 0), arcpy.Point(0, 100), arcpy.Point(100, 100), arcpy.Point(100, 0)])
+polygon = arcpy.Polygon(array)
+cursor.insertRow([polygon])
+
+# Wybierz warstwę i włącz etykiety
+warstwa = proj.listMaps()[0].listLayers()[0]  # Możesz zmienić indeks, aby wybrać inną warstwę
+warstwa.showLabels = True
+
+# Konfiguruj etykiety
+warstwa.labelClasses[0].expression = "[NazwaAtrybutu]"  # Zastąp "NazwaAtrybutu" nazwą atrybutu do etykietowania
+
+# Zastosuj maskowanie przestrzeni dla etykiet
+warstwa.labelClasses[0].spaceCharacter = "mask"
+warstwa.labelClasses[0].masking = True
+warstwa.labelClasses[0].maskPolygons = maska_warstwa
+
+# Zapisz zmiany w projekcie
+proj.save()
+
+print("Proces zakończony.")
