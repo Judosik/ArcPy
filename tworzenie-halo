@@ -1,0 +1,30 @@
+import arcpy
+
+# Ścieżka do twojego projektu ArcGIS
+projekt = "ścieżka_do_twojego_projektu_arcgis.aprx"
+
+# Utwórz nowy projekt ArcGIS
+proj = arcpy.mp.ArcGISProject(projekt)
+
+# Wybierz layout
+layout = proj.listLayouts()[0]  # Możesz zmienić indeks, aby wybrać inny layout
+
+# Wybierz warstwę i włącz etykiety
+warstwa = proj.listMaps()[0].listLayers()[0]  # Możesz zmienić indeks, aby wybrać inną warstwę
+warstwa.showLabels = True
+
+# Konfiguruj etykiety
+warstwa.labelClasses[0].expression = "[NazwaAtrybutu]"  # Zastąp "NazwaAtrybutu" nazwą atrybutu do etykietowania
+
+# Dodaj halo do etykiet
+warstwa.labelClasses[0].haloSize = 1.0  # Ustaw wielkość halo (jednostki są w pikselach)
+warstwa.labelClasses[0].haloColor = {"RGB": [255, 255, 255]}  # Ustaw kolor halo (biały)
+
+# Ustawienia pozycji i rozmiaru etykiet
+warstwa.labelClasses[0].placement = "ABOVE_CENTER"  # Ustawienie pozycji etykiet nad obiektami
+warstwa.labelClasses[0].weight = "BOLD"  # Wytłuszczenie tekstu etykiet
+
+# Zapisz zmiany w projekcie
+proj.save()
+
+print("Proces zakończony.")
