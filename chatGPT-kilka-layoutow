@@ -1,0 +1,80 @@
+import arcpy
+
+# Ścieżka do twojego projektu ArcGIS
+projekt = "ścieżka_do_twojego_projektu_arcgis.aprx"
+
+# Utwórz nowy projekt ArcGIS
+proj = arcpy.mp.ArcGISProject(projekt)
+
+# Utwórz nowe layouty
+layout_A4_1 = proj.listLayouts()[0]  
+layout_A4_2 = proj.listLayouts()[1]
+layout_A5 = proj.listLayouts()[2]
+
+# Ustawienia rozmiaru i orientacji strony
+layout_A4_1.pageHeight = 8.27
+layout_A4_1.pageWidth = 11.69
+layout_A4_1.pageOrientation = "LANDSCAPE"
+
+layout_A4_2.pageHeight = 8.27
+layout_A4_2.pageWidth = 11.69
+layout_A4_2.pageOrientation = "LANDSCAPE"
+
+layout_A5.pageHeight = 11.69
+layout_A5.pageWidth = 8.27
+layout_A5.pageOrientation = "PORTRAIT"
+
+# Dodaj mapę
+def dodaj_mape(layout, warstwy):
+    mapa = layout.listElements('MAPFRAME_ELEMENT')[0]
+    for warstwa in warstwy:
+        mapa.camera.setExtent(warstwa.getExtent())
+
+# Dodaj legendę
+def dodaj_legende(layout):
+    legend = layout.listElements('LEGEND_ELEMENT')[0]
+    legend.autoAdd = True
+
+# Dodaj znak północy
+def dodaj_znak_polnocy(layout):
+    znak_polnocy = layout.listElements('TEXT_ELEMENT')[1]
+    znak_polnocy.text = "Znak Północy"
+
+# Dodaj nagłówek
+def dodaj_naglowek(layout, nazwa):
+    naglowek = layout.listElements('TEXT_ELEMENT')[0]
+    naglowek.text = f"Mapa obrazująca {nazwa}"
+
+# Dodaj ramkę
+def dodaj_ramke(layout):
+    ramka = layout.listElements('GRAPHIC_ELEMENT')[0]
+    ramka.elementPositionX = 0.1
+    ramka.elementPositionY = 0.1
+
+# Ustawienia warstw
+warstwy_1 = ["nazwa_warstwy1", "nazwa_warstwy2", "nazwa_warstwy3", "nazwa_ortofotomapy"]
+warstwy_2 = ["inna_warstwa1", "inna_warstwa2", "inna_warstwa3", "nazwa_ortofotomapy"]
+
+# Dodaj elementy do layoutów
+dodaj_mape(layout_A4_1, warstwy_1)
+dodaj_legende(layout_A4_1)
+dodaj_naglowek(layout_A4_1, "Nazwa 1")
+dodaj_znak_polnocy(layout_A4_1)
+dodaj_ramke(layout_A4_1)
+
+dodaj_mape(layout_A4_2, warstwy_1)
+dodaj_legende(layout_A4_2)
+dodaj_naglowek(layout_A4_2, "Nazwa 2")
+dodaj_znak_polnocy(layout_A4_2)
+dodaj_ramke(layout_A4_2)
+
+dodaj_mape(layout_A5, warstwy_2)
+dodaj_legende(layout_A5)
+dodaj_naglowek(layout_A5, "Nazwa 3")
+dodaj_znak_polnocy(layout_A5)
+dodaj_ramke(layout_A5)
+
+# Zapisz zmiany w projekcie
+proj.save()
+
+print("Proces zakończony.")
